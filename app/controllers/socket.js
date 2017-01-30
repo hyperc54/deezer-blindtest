@@ -1,7 +1,51 @@
 global.io  = io.listen(app.server); // Initialize socket.io
 
+function interval(duration, fn){
+  this.baseline = undefined
+
+  this.run = function(){
+    if(this.baseline === undefined){
+      this.baseline = new Date().getTime()
+    }
+    fn()
+    var end = new Date().getTime()
+    this.baseline += duration
+
+    var nextTick = duration - (end - this.baseline)
+    if(nextTick<0){
+      nextTick = 0
+    }
+    (function(i){
+        i.timer = setTimeout(function(){
+        i.run(end)
+      }, nextTick)
+    }(this))
+  }
+}
+
 // Listen for client connection to join them in the right room
 io.on('connection', socket => {
+
+	let startTrackEmission = () => {
+		const message = {
+			room: {
+				id: 123,
+			},
+			state: 2,
+			track: 136889434,
+			countDown: 20
+		};
+		console.log(message);
+		socket.broadcast.emit('StartTrackMessage', message);
+	}
+
+	const timer = new interval(20000, startTrackEmission);
+	timer.run();
+
+	socket.on('blindtest', function(resp){
+		console.log(resp);
+	})
+
 	socket.on('join', room => socket.join(room));
 
 	socket.on('guess', function(string) {

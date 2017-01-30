@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Allow Cross-Origin Resource Sharing
  */

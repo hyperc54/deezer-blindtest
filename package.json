@@ -6,7 +6,8 @@
   "private": true,
   "author": "Deezer <core@deezer.com>",
   "contributors": [
-    "Nicolas Le Gall <nlegall@deezer.com>"
+    "Nicolas Le Gall <nlegall@deezer.com>",
+    "Victor Delépine <vdelepine@deezer.com>"
   ],
   "scripts": {
     "lint": "eslint src/**",
@@ -14,7 +15,7 @@
     "test": "jest",
     "jest": "jest --watch",
     "coverage": "jest --coverage || true",
-    "watch": "nodemon app.js"
+    "watch": "nodemon --inspect app.js"
   },
   "homepage": "https://github.deezerdev.com/nlegall/blindtest",
   "repository": {
@@ -27,13 +28,22 @@
   "dependencies": {
     "async": "^2.1.4",
     "body-parser": "^1.16.0",
+    "compression": "^1.6.2",
+    "cors": "^2.8.1",
     "express": "^4.14.1",
+    "express-mung": "^0.4.6",
+    "express-vue": "^3.5.1",
+    "mongoose-paginate": "^5.0.3",
+    "mongoose-sequence": "^3.1.0",
+    "querystring": "^0.2.0",
     "redis": "^2.6.5",
+    "request": "^2.79.0",
     "socket.io": "^1.7.2"
   },
   "devDependencies": {
     "eslint": "^3.14.1",
     "jest": "^18.1.0",
+    "mongoose": "^4.8.0",
     "nodemon": "^1.11.0"
   },
   "jest": {

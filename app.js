@@ -7,18 +7,23 @@ console.log(`★ Node ${process.version} (PID: ${process.pid})`);
 const path = require('path');
 
 // Set globals
-global.app     = require('express')();
+global.express = require('express');
+global.app     = express();
 global.async   = require('async');
 global.io      = require('socket.io');
+global.request = require('request');
 
 // Configure the app
 require(path.join(__dirname, 'app/config.js')); // Load the configuration
 require(path.join(app.dir.core, 'patch'));      // Quickly patch the application to ease the development
 
+// Set some global middlewares
+app.use(app.middlewares("cors compression"));
+
 // Launch the application after having checked some mandatory middlewares
 async.series(
 	[
-		require(path.join(app.dir.core, 'redis')), // Initialize the Redis link
+		require(path.join(app.dir.core, 'mongodb')), // Initialize the MongoDB link
 	],
 	function() {
 		// Load the controllers
@@ -46,7 +51,7 @@ async.series(
 		app.server.on('close', () => {
 			console.log('⏏ Shutting down');
 			console.log('😘');
-			redis.quit();
+			mongoose.connection.close();
 		});
 
 		function shutdown() {

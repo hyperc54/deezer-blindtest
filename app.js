@@ -38,12 +38,7 @@ async.series(
 
 		// Finally launch the application
 		app.server = app.listen(app.get('port'));
-		global.io  = io.listen(app.server); // Initialize socket.io
-
-		// Listen for client connection to join them in the right room
-		io.on('connection', socket => {
-			socket.on('join', room => socket.join(room));
-		});
+		app.controller('socket');
 
 		console.log(`✓ ${app.get('name')} v${app.get('version')} running on http://localhost:${app.get('port')} (${app.get('env')})`);
 		console.log('😄  (Ctrl + C to exit)\n');

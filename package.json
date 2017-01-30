@@ -1,0 +1,42 @@
+{
+  "name": "deezer-blindtest",
+  "description": "",
+  "version": "1.0.0",
+  "license": "Proprietary",
+  "private": true,
+  "author": "Deezer <core@deezer.com>",
+  "contributors": [
+    "Nicolas Le Gall <nlegall@deezer.com>"
+  ],
+  "scripts": {
+    "lint": "eslint src/**",
+    "start": "node app.js",
+    "test": "jest",
+    "jest": "jest --watch",
+    "coverage": "jest --coverage || true",
+    "watch": "nodemon app.js"
+  },
+  "homepage": "https://github.deezerdev.com/nlegall/blindtest",
+  "repository": {
+    "type": "git",
+    "url": "https://github.deezerdev.com/nlegall/blindtest.git"
+  },
+  "bugs": {
+    "url": "https://github.deezerdev.com/nlegall/blindtest/issues"
+  },
+  "dependencies": {
+    "async": "^2.1.4",
+    "body-parser": "^1.16.0",
+    "express": "^4.14.1",
+    "redis": "^2.6.5",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^3.14.1",
+    "jest": "^18.1.0",
+    "nodemon": "^1.11.0"
+  },
+  "jest": {
+    "testRegex": "tests/.*\\.js$"
+  }
+}

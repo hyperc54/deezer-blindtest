@@ -1,5 +1,7 @@
 global.io  = io.listen(app.server); // Initialize socket.io
 
+global.timers = {};
+
 function interval(duration, fn){
   this.baseline = undefined
 
@@ -39,14 +41,21 @@ io.on('connection', socket => {
 		socket.broadcast.emit('StartTrackMessage', message);
 	}
 
-	const timer = new interval(20000, startTrackEmission);
-	timer.run();
+	//const timer = new interval(20000, startTrackEmission);
+	//timer.run();
 
 	socket.on('blindtest', function(resp){
 		console.log(resp);
 	})
 
-	socket.on('join', room => socket.join(room));
+	socket.on('join', room => {
+		global.timers[room] = global.timers[room] || setInterval(function() {
+			console.log('Track done for room', room);
+			socket.to(room).emit('track-ended');
+		}, 30000);
+
+		socket.join(room);
+	});
 
 	socket.on('guess', function(string) {
 		const room = socket.rooms[socket.id]; // Marche pas

@@ -37,10 +37,14 @@ router.all('/:blindtest', app.middleware('allowed')('get', 'put', 'patch', 'dele
 
 // Get a blindtest
 router.get('/:blindtest.:format?', app.middleware('supported')('json html'), (req, res) => {
+	const vue = {
+		components: ['dzrheader', 'dzrfooter']
+	};
+
 	Blindtest
 		.findOne({ id: req.params.blindtest })
 		.select(req.fields.select('Blindtest'))
-		.then(blindtest => blindtest ? res.negotiate(blindtest, 'blindtest') : res.status(404).end())
+		.then(blindtest => blindtest ? res.negotiate({data: blindtest, vue}, 'Blindtest') : res.status(404).end())
 		.catch(error => res.send(error)); // FIXME
 });
 

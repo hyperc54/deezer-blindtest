@@ -27,6 +27,7 @@ async.series(
 	],
 	function() {
 		// Load the controllers
+		app.controller('home');
 		app.controller('blindtests');
 
 		// In production, automatically handle 404 and errors

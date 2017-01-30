@@ -15,7 +15,8 @@
     "test": "jest",
     "jest": "jest --watch",
     "coverage": "jest --coverage || true",
-    "watch": "nodemon --inspect app.js"
+    "sass": "node-sass --watch css/global.scss public/css/global.css",
+    "watch": "nodemon --inspect --ext js,json,vue app.js"
   },
   "homepage": "https://github.deezerdev.com/nlegall/blindtest",
   "repository": {
@@ -44,6 +45,7 @@
     "eslint": "^3.14.1",
     "jest": "^18.1.0",
     "mongoose": "^4.8.0",
+    "node-sass": "^4.4.0",
     "nodemon": "^1.11.0"
   },
   "jest": {

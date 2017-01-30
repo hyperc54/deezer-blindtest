@@ -2,4 +2,3 @@ database/
 node_modules/
 npm-debug.log
 .DS_Store
-/public/css/global.css

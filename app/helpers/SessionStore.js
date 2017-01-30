@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = function(session) {
 	var Store = session.Store;
 

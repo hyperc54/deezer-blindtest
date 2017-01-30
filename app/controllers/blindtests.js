@@ -16,12 +16,12 @@ router.get('/', app.middleware('list')(), (req, res) => {
 
 	Blindtest
 		.paginate(req.where, options)
-		.then(blindtests => res.negotiate(blindtests))
+		.then(blindtests => res.send(blindtests))
 		.catch(error => res.send(error)); // FIXME
 });
 
 // Create a blindtest
-router.post('/', (req, res) => {
+router.post('/', app.middleware('body-parser'), (req, res) => {
 	new Blindtest(req.body)
 		.save()
 		.then(blindtest => res.status(201).set('Location', `${app.locals.root}${req.baseUrl}/${blindtest.id}`).send(blindtest))
@@ -36,15 +36,11 @@ router.post('/', (req, res) => {
 router.all('/:blindtest', app.middleware('allowed')('get', 'put', 'patch', 'delete'), app.middleware('fields'));
 
 // Get a blindtest
-router.get('/:blindtest.:format?', app.middleware('supported')('json html'), (req, res) => {
-	const vue = {
-		components: ['dzrheader', 'dzrfooter']
-	};
-
+router.get('/:blindtest', (req, res) => {
 	Blindtest
 		.findOne({ id: req.params.blindtest })
 		.select(req.fields.select('Blindtest'))
-		.then(blindtest => blindtest ? res.negotiate({data: blindtest, vue}, 'Blindtest') : res.status(404).end())
+		.then(blindtest => blindtest ? res.send(blindtest) : res.status(404).end())
 		.catch(error => res.send(error)); // FIXME
 });
 

@@ -35,16 +35,11 @@ app.config = {
 
 // Set the main directories
 app.dir = {
-	components:  path.join(__dirname, 'components'),
 	controllers: path.join(__dirname, 'controllers'),
 	core:        path.join(__dirname, 'core'),
 	helpers:     path.join(__dirname, 'helpers'),
 	middlewares: path.join(__dirname, 'middlewares'),
 	models:      path.join(__dirname, 'models'),
-	views:       path.join(__dirname, 'views'),
-
-	shared: path.join(__dirname, '../../shared'), // The shared folder must be outside, to avoid removing it when deploying
-	public: path.join(__dirname, '../public')
 };
 
 // Configure Express
@@ -52,21 +47,7 @@ app.set('etag',         false);
 app.set('name',         json.name);
 app.set('port',         process.argv[2] || 3000);
 app.set('version',      json.version);
-app.set('view engine', 'vue');
-app.set('views',        app.dir.views);
 app.set('x-powered-by', false);
-
-// Configure Vue.js
-app.set('vue', {
-	componentsDir: app.dir.components,
-	defaultLayout: 'layout'
-});
-
-// Define the static middleware
-app.use(express.static(app.dir.public));
-
-// Set the rendering engines
-app.engine('vue', require('express-vue'));
 
 // Use a middleware to retrieve the hostname (doesn't have to configure)
 app.use((req, res, next) => {

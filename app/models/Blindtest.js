@@ -6,7 +6,7 @@ const
 			type: String,
 			enum: ['default', 'flow', 'playlist']
 		},
-		tracklist: [Number]
+		tracklist: [String]
 	});
 
 Blindtest.plugin(require('mongoose-paginate'));

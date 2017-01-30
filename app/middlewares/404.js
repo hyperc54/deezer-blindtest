@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Send a 404 HTTP status code
  * /!\ This middleware will end the response

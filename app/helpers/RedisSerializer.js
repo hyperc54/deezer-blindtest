@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Serialize an object so it can be stored in Redis and still updated
  * Storing strings is not convenient when you want to increment values or subscribe to changes

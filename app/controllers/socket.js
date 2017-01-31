@@ -19,9 +19,9 @@ global.messages = {
 		'Not quite'
 	],
 	broadcast: [
-		'Ugh? Really? %s',
-		'Are you serious %s?',
-		'Not quite %s'
+		'Ugh? Really? <span>%s</span>',
+		'Are you serious <span>%s</span>?',
+		'Not quite <span>%s</span>'
 	]
 };
 
@@ -145,7 +145,7 @@ io.on('connection', socket => {
 			players: blindtest.players
 		});
 
-		socket.to(room).emit('NewPlayerBroadcast', player);
+		socket.to(room).emit('NewPlayerBroadcast', blindtest.players);
 	});
 
 	socket.on('ClientGuessMessage', value => {

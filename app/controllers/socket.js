@@ -25,12 +25,19 @@ function loop() {
 
 		if (now > blindtest.started + DURATION) {
 			console.log('Finished:', blindtest.json.title);
+			const old = blindtest.tracklist[blindtest.index];
 			blindtest.index = Math.round(Math.random() * blindtest.tracklist.length);
 			blindtest.state = 'waiting';
 			blindtest.started = now + WAITING;
 			const track = blindtest.tracklist[blindtest.index];
 			track.md5 = track.preview.replace(/^.+([a-f0-9]{32}).+/, '$1');
 			io.to(room).emit('EndOfTrackMessage', {
+				answer: {
+					artist: old.artist.name,
+					album: old.album.title,
+					track: old.title,
+					cover: old.album.cover_big
+				},
 				scores: [],
 				nextTrack: {
 					id: track.id,
@@ -83,14 +90,19 @@ io.on('connection', socket => {
 		let player = blindtest.players.filter(player => player.id === data.id || 0);
 
 		if (!player.length) {
-			const {id, name, avatar} = data;
-			player = {id, name, avatar, socket: socket.id};
+			const {id, name, avatarUrl} = data;
+			player = {id, name, avatarUrl, socket: socket.id};
 			blindtest.players.push(player);
 		} else {
 			player = player[0];
 		}
 
 		socket.emit('NewPlayerMessage', {
+			room: {
+				name: blindtest.json ? blindtest.json.title : 'Playlist',
+				type: 2,
+				mode: 1
+			},
 			timeRemaining: DURATION - (Date.now() - blindtest.started),
 			players: blindtest.players
 		});
@@ -104,13 +116,14 @@ io.on('connection', socket => {
 
 		if (!player.length) { return; }
 
-		const {id, name, avatar} = player[0];
+		const {id, name, avatarUrl} = player[0];
 		blindtests.players.splice(blindtests.players.indexOf(player[0]), 1);
-		socket.to(room).emit('PlayerLeaveBroadcast', {id, name, avatar});
+		socket.to(room).emit('PlayerLeaveBroadcast', {id, name, avatarUrl});
 	});
 
-	socket.on('clientGuessMessage', value => {
+	socket.on('ClientGuessMessage', value => {
 		const blindtest = global.blindtests[value.room];
+		const player = blindtest.players.filter(player => player.socket === socket.id);
 		if (!blindtest) { return; }
 
 		const track = blindtest.tracklist[blindtest.index];
@@ -118,14 +131,17 @@ io.on('connection', socket => {
 		const answer = (track.artist.name || '').toLowerCase();
 		console.log(guess, 'against', answer);
 		if (answer === guess) {
-			socket.emit('ServerGoodAnswerMessage');
-			socket.to(value.room).emit('ServerGoodAnswerBroadcast', {
-				message: 'Machin a trouvé !'
-			});
+			socket.emit('ServerGoodAnswerMessage', {newScore: 0}); // TODO
+			socket.to(value.room).emit('ServerGoodAnswerBroadcast', {id: player[0].id});
 		} else {
-			socket.emit('ServerBadAnswerMessage');
+			socket.emit('ServerBadAnswerMessage', {
+				guess: value.guess,
+				message: "You sucks!"
+			});
+
 			socket.to(value.room).emit('ServerBadAnswerBroadcast', {
-				message: 'Ahahah, bidule a répondu ' + value.guess + ' quel gros looser!'
+				id: player[0].id,
+				message: player[0].name + 'thought it was' + value.guess + '! Shame on him!'
 			});
 		}
 	});

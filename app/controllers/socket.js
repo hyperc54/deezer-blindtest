@@ -19,9 +19,9 @@ global.messages = {
 		'Not quite'
 	],
 	broadcast: [
-		'Ugh? Really? <span>%s</span>',
-		'Are you serious <span>%s</span>?',
-		'Not quite <span>%s</span>'
+		'%g? Ugh? Really? %s',
+		'%g? Are you serious %s?',
+		'%g? Not quite %s'
 	]
 };
 
@@ -190,7 +190,7 @@ io.on('connection', socket => {
 
 			socket.to(value.room).emit('ServerBadAnswerBroadcast', {
 				id: player[0].id,
-				message: global.messages.broadcast[Math.floor(Math.random() * global.messages.broadcast.length)].replace('%s', player[0].name)
+				message: global.messages.broadcast[Math.floor(Math.random() * global.messages.broadcast.length)].replace('%g', value.guess)
 			});
 		}
 	});

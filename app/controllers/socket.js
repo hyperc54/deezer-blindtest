@@ -162,7 +162,7 @@ io.on('connection', socket => {
 		const answer = (track.artist.name || '').toLowerCase();
 		console.log(guess, 'against', answer);
 
-		if (track.scores.indexOf(player[0]) > -1) {
+		if ((track.scores || []).indexOf(player[0]) > -1) {
 			console.log(player[0], 'tried to resubmit an answer but already found');
 			return;
 		}

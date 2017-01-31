@@ -150,9 +150,9 @@ io.on('connection', socket => {
 
 	socket.on('ClientGuessMessage', value => {
 		const blindtest = global.blindtests[value.room];
-		const player = blindtest.players.filter(player => player.socket === socket.id);
 		if (!blindtest) { return; }
 
+		const player = blindtest.players.filter(player => player.socket === socket.id);
 		if (!player.length) {
 			debugger;
 		}

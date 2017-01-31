@@ -181,6 +181,10 @@ io.on('connection', socket => {
 				message: global.messages.bad[Math.floor(Math.random() * global.messages.bad.length)]
 			});
 
+			if (!player[0]) {
+				console.log('BOOM', player);
+			}
+
 			socket.to(value.room).emit('ServerBadAnswerBroadcast', {
 				id: player[0].id,
 				message: global.messages.broadcast[Math.floor(Math.random() * global.messages.broadcast.length)].replace('%s', player[0].name)

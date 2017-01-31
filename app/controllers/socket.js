@@ -174,7 +174,10 @@ io.on('connection', socket => {
 				message: global.messages.good[Math.floor(Math.random() * global.messages.good.length)].replace('%d', 1),
 				newScore: player[0].score
 			});
-			socket.to(value.room).emit('ServerGoodAnswerBroadcast', {id: player[0].id});
+			socket.to(value.room).emit('ServerGoodAnswerBroadcast', {
+				id: player[0].id,
+				newScore: player[0].score
+			});
 		} else {
 			socket.emit('ServerBadAnswerMessage', {
 				guess: value.guess,

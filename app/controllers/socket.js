@@ -3,7 +3,27 @@ const fetch = require('node-fetch');
 global.io = io.listen(app.server); // Initialize socket.io
 global.blindtests = {};
 
-console.log('Blindtest global state', global.blindtests);
+global.messages = {
+	good: [
+		'Well done buddy',
+		'There you go, %d point!',
+		'Very good indeed!',
+		'Awe — wait for it — some!',
+		'Yeah baby!'
+	],
+	bad: [
+		'Ugh? Really?',
+		'Is that even a real name?',
+		'Nope',
+		'Are you serious?',
+		'Not quite'
+	],
+	broadcast: [
+		'Ugh? Really? %s',
+		'Are you serious %s?',
+		'Not quite %s'
+	]
+};
 
 const DURATION = 30 * 1000;
 const INTERVAL = 1000;
@@ -18,7 +38,9 @@ function loop() {
 			console.log('Blindtest is', blindtest.state, 'launching it now');
 			blindtest.started = Date.now();
 			blindtest.state = 'started';
-			const {id, md5} = blindtest.tracklist[blindtest.index];
+			const track = blindtest.tracklist[blindtest.index];
+			track.scores = [];
+			const {id, md5} = track;
 			io.to(room).emit('StartTrackMessage', {id, md5});
 			continue;
 		}
@@ -31,6 +53,9 @@ function loop() {
 			blindtest.started = now + WAITING;
 			const track = blindtest.tracklist[blindtest.index];
 			track.md5 = track.preview.replace(/^.+([a-f0-9]{32}).+/, '$1');
+
+			const scores = old.scores.sort((a, b) => a.score < b.score);
+
 			io.to(room).emit('EndOfTrackMessage', {
 				answer: {
 					artist: old.artist.name,
@@ -38,7 +63,7 @@ function loop() {
 					track: old.title,
 					cover: old.album.cover_big
 				},
-				scores: [],
+				scores,
 				nextTrack: {
 					id: track.id,
 					md5: track.md5
@@ -81,6 +106,19 @@ setTimeout(loop, INTERVAL);
 
 // Listen for client connection to join them in the right room
 io.on('connection', socket => {
+	socket.on('disconnect', function() {
+		for (let room in global.blindtests) {
+			const blindtest = global.blindtests[room];
+			const player = blindtest.players.filter(player => player.socket === socket.id);
+
+			if (!player.length) { continue; }
+
+			const {id, name, avatarUrl, score} = player[0];
+			blindtest.players.splice(blindtest.players.indexOf(player[0]), 1);
+			socket.to(room).emit('PlayerLeaveBroadcast', {id, name, avatarUrl, score});
+		}
+	});
+
 	console.log('Connection received from socket', socket.id);
 	socket.on('join', (room, data = {}) => {
 		console.log(`Joined the room ${room}`);
@@ -91,7 +129,7 @@ io.on('connection', socket => {
 
 		if (!player.length) {
 			const {id, name, avatarUrl} = data;
-			player = {id, name, avatarUrl, socket: socket.id};
+			player = {id, name, avatarUrl, score: 0, socket: socket.id};
 			blindtest.players.push(player);
 		} else {
 			player = player[0];
@@ -103,22 +141,11 @@ io.on('connection', socket => {
 				type: 2,
 				mode: 1
 			},
-			timeRemaining: DURATION - (Date.now() - blindtest.started),
+			timeRemaining: DURATION - (Date.now() - (blindtest.started || 0)),
 			players: blindtest.players
 		});
 
 		socket.to(room).emit('NewPlayerBroadcast', player);
-	});
-
-	socket.on('leave', room => {
-		const blindtest = global.blindtests[room];
-		const player = blindtest.players.filter(player => player.socket === socket.id);
-
-		if (!player.length) { return; }
-
-		const {id, name, avatarUrl} = player[0];
-		blindtests.players.splice(blindtests.players.indexOf(player[0]), 1);
-		socket.to(room).emit('PlayerLeaveBroadcast', {id, name, avatarUrl});
 	});
 
 	socket.on('ClientGuessMessage', value => {
@@ -126,22 +153,37 @@ io.on('connection', socket => {
 		const player = blindtest.players.filter(player => player.socket === socket.id);
 		if (!blindtest) { return; }
 
+		if (!player.length) {
+			debugger;
+		}
+
 		const track = blindtest.tracklist[blindtest.index];
 		const guess = String(value.guess).toLowerCase();
 		const answer = (track.artist.name || '').toLowerCase();
 		console.log(guess, 'against', answer);
+
+		if (track.scores.indexOf(player[0]) > -1) {
+			console.log(player[0], 'tried to resubmit an answer but already found');
+			return;
+		}
+
 		if (answer === guess) {
-			socket.emit('ServerGoodAnswerMessage', {newScore: 0}); // TODO
+			player[0].score++;
+			track.scores.push(player[0]);
+			socket.emit('ServerGoodAnswerMessage', {
+				message: global.messages.good[Math.floor(Math.random() * global.messages.good.length)].replace('%d', 1),
+				newScore: player[0].score
+			});
 			socket.to(value.room).emit('ServerGoodAnswerBroadcast', {id: player[0].id});
 		} else {
 			socket.emit('ServerBadAnswerMessage', {
 				guess: value.guess,
-				message: "You sucks!"
+				message: global.messages.bad[Math.floor(Math.random() * global.messages.bad.length)]
 			});
 
 			socket.to(value.room).emit('ServerBadAnswerBroadcast', {
 				id: player[0].id,
-				message: player[0].name + 'thought it was' + value.guess + '! Shame on him!'
+				message: global.messages.broadcast[Math.floor(Math.random() * global.messages.broadcast.length)].replace('%s', player[0].name)
 			});
 		}
 	});

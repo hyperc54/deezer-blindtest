@@ -34,6 +34,7 @@
     "express-mung": "^0.4.6",
     "mongoose-paginate": "^5.0.3",
     "mongoose-sequence": "^3.1.0",
+    "node-fetch": "^1.6.3",
     "querystring": "^0.2.0",
     "redis": "^2.6.5",
     "request": "^2.79.0",

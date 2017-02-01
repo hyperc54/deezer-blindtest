@@ -121,6 +121,9 @@ io.on('connection', socket => {
 
 	console.log('Connection received from socket', socket.id);
 	socket.on('join', (room, data = {}) => {
+		if (!data) {
+			return;
+		}
 		console.log(`Joined the room ${room}`);
 		socket.join(room);
 
@@ -128,9 +131,13 @@ io.on('connection', socket => {
 		let player = blindtest.players.filter(player => player.id === data.id || 0);
 
 		if (!player.length) {
-			const {id, name, avatarUrl} = data;
-			player = {id, name, avatarUrl, score: 0, socket: socket.id};
-			blindtest.players.push(player);
+			if (data) {
+				const {id, name, avatarUrl} = data;
+				player = {id, name, avatarUrl, score: 0, socket: socket.id};
+				blindtest.players.push(player);
+			} else {
+				socket.emit('NewPlayerError', {error: 'Error while adding user to the room'});
+			}
 		} else {
 			player = player[0];
 		}
@@ -154,7 +161,7 @@ io.on('connection', socket => {
 
 		const player = blindtest.players.filter(player => player.socket === socket.id);
 		if (!player.length) {
-			debugger;
+			return;
 		}
 
 		const track = blindtest.tracklist[blindtest.index];

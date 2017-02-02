@@ -32,6 +32,7 @@
     "cors": "^2.8.1",
     "express": "^4.14.1",
     "express-mung": "^0.4.6",
+    "levenshtein": "^1.0.5",
     "mongoose-paginate": "^5.0.3",
     "mongoose-sequence": "^3.1.0",
     "node-fetch": "^1.6.3",

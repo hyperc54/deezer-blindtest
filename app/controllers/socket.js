@@ -67,6 +67,7 @@ function loop() {
 
             io.to(room).emit('EndOfTrackMessage', {
                 answer: {
+                    id: old.id,
                     artist: old.artist.name,
                     album: old.album.title,
                     track: old.title,

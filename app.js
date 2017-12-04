@@ -23,11 +23,8 @@ app.use(app.middlewares("cors compression"));
 // Launch the application after having checked some mandatory middlewares
 async.series(
 	[
-		require(path.join(app.dir.core, 'mongodb')), // Initialize the MongoDB link
 	],
 	function() {
-		// Load the controllers
-		app.controller('blindtests');
 
 		// In production, automatically handle 404 and errors
 		if (app.get('env') === 'production') {
@@ -46,7 +43,6 @@ async.series(
 		app.server.on('close', () => {
 			console.log('⏏ Shutting down');
 			console.log('😘');
-			mongoose.connection.close();
 		});
 
 		function shutdown() {

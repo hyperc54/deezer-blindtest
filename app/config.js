@@ -4,10 +4,7 @@ const
 
 // Set the configurations
 app.config = {
-	// MongoDB configuration
-	mongodb: {
-		uri: `mongodb://localhost:27017/${json.name.toLowerCase()}`
-	},
+
 
 	// Redis configuration
 	redis: {
